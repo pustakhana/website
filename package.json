@@ -2,16 +2,17 @@
   "name": "pustakkhana",
   "version": "1.0.0",
   "description": "Pustakkhana - Online Book Vending Platform",
-  "main": "server/src/server.js",
-  "type": "module",
+  "main": "src/server/server.js",
   "engines": {
     "node": "24.x"
   },
   "scripts": {
-    "start": "cd server && npm start",
-    "dev": "concurrently \"cd server && npm run dev\" \"cd client && npm start\"",
-    "build": "cd client && npm run build",
-    "postinstall": "cd server && npm install && cd ../client && npm install"
+    "install:all": "npm install && cd src/server && npm install && cd ../client && npm install",
+    "dev": "concurrently \"cd src/server && npm run dev\" \"cd src/client && npm start\"",
+    "server": "cd src/server && npm start",
+    "client": "cd src/client && npm start",
+    "build": "cd src/client && npm run build",
+    "postinstall": "cd src/server && npm install && cd ../client && npm install"
   },
   "keywords": [
     "bookstore",
