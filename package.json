@@ -1,0 +1,27 @@
+{
+  "name": "pustakkhana",
+  "version": "1.0.0",
+  "description": "Pustakkhana - Online Book Vending Platform",
+  "main": "server/src/server.js",
+  "type": "module",
+  "engines": {
+    "node": "18.x"
+  },
+  "scripts": {
+    "start": "cd server && npm start",
+    "dev": "concurrently \"cd server && npm run dev\" \"cd client && npm start\"",
+    "build": "cd client && npm run build",
+    "postinstall": "cd server && npm install && cd ../client && npm install"
+  },
+  "keywords": [
+    "bookstore",
+    "ecommerce",
+    "books",
+    "MERN"
+  ],
+  "author": "Dhruva Wani",
+  "license": "ISC",
+  "devDependencies": {
+    "concurrently": "^7.0.0"
+  }
+}
