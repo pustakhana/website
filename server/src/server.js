@@ -14,21 +14,28 @@ const app = express();
 
 // Middleware
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production' 
-    ? ['https://pustakkhana-web.web.app', 'https://your-domain.com']
-    : '*'
+  origin: '*'
 }));
 app.use(express.json());
+
+// Serve static files from React build
+const buildPath = path.join(__dirname, '../../client/build');
+app.use(express.static(buildPath));
 
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.json({ status: 'OK', message: 'Server is running' });
 });
 
-// Routes
+// API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/books', bookRoutes);
 app.use('/api/orders', orderRoutes);
+
+// Catch-all: Serve React app for all non-API routes
+app.get('*', (req, res) => {
+  res.sendFile(path.join(buildPath, 'index.html'));
+});
 
 // Initialize app
 const initializeApp = async () => {

@@ -1,7 +1,11 @@
 import axios from 'axios';
 
+// In production, API is on same domain (served by same Express server)
+// In development, use localhost
+const API_BASE_URL = process.env.NODE_ENV === 'production' ? '' : 'http://localhost:5001';
+
 const API = axios.create({
-  baseURL: 'http://localhost:5001/api',
+  baseURL: `${API_BASE_URL}/api`,
 });
 
 // Add token to requests
