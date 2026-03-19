@@ -2,7 +2,7 @@
   "version": 2,
   "buildCommand": "cd client && npm install && npm run build && cd ../server && npm install",
   "outputDirectory": "client/build",
-  "framework": "react",
+  "framework": "create-react-app",
   "rewrites": [
     {
       "source": "/api/(.*)",
