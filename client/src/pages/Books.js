@@ -21,6 +21,7 @@ function Books() {
     loadBooks();
     loadFilters();
     loadCart();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, search, genre, language]);
 
   const loadBooks = async () => {
