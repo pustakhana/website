@@ -25,8 +25,8 @@ export const authAPI = {
 export const booksAPI = {
   getBooks: (params) => API.get('/books', { params }),
   getBook: (id) => API.get(`/books/${id}`),
-  getGenres: () => API.get('/books/filters/genres'),
-  getLanguages: () => API.get('/books/filters/languages'),
+  getGenres: () => API.get('/filters/genres'),
+  getLanguages: () => API.get('/filters/languages'),
 };
 
 export const ordersAPI = {

@@ -5,7 +5,7 @@ const auth = require('../middleware/auth');
 const router = express.Router();
 
 // Get available genres - MUST come before /:id route
-router.get('/filters/genres', async (req, res) => {
+router.get('/genres', async (req, res) => {
   try {
     const genres = await Book.distinct('genre');
     res.json(genres.filter(Boolean));
@@ -16,7 +16,7 @@ router.get('/filters/genres', async (req, res) => {
 });
 
 // Get available languages - MUST come before /:id route
-router.get('/filters/languages', async (req, res) => {
+router.get('/languages', async (req, res) => {
   try {
     const languages = await Book.distinct('language');
     res.json(languages.filter(Boolean));

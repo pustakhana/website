@@ -47,6 +47,27 @@ app.use('/api/auth', authRoutes);
 app.use('/api/books', bookRoutes);
 app.use('/api/orders', orderRoutes);
 
+// Filter routes - separate from books for clarity
+app.get('/api/filters/genres', async (req, res) => {
+  try {
+    const genres = await Book.distinct('genre');
+    res.json(genres.filter(Boolean));
+  } catch (error) {
+    console.error('Error fetching genres:', error);
+    res.status(500).json({ message: 'Error fetching genres', error: error.message });
+  }
+});
+
+app.get('/api/filters/languages', async (req, res) => {
+  try {
+    const languages = await Book.distinct('language');
+    res.json(languages.filter(Boolean));
+  } catch (error) {
+    console.error('Error fetching languages:', error);
+    res.status(500).json({ message: 'Error fetching languages', error: error.message });
+  }
+});
+
 // Catch-all: Serve React app for all non-API routes
 app.get('*', (req, res) => {
   res.sendFile(path.join(buildPath, 'index.html'));
