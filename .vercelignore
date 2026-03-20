@@ -6,7 +6,6 @@ README.md
 .env.local
 npm-debug.log
 yarn-error.log
-src/server
 src/client/node_modules
 src/client/src
 src/client/public

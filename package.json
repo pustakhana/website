@@ -11,8 +11,7 @@
     "dev": "concurrently \"cd src/server && npm run dev\" \"cd src/client && npm start\"",
     "server": "cd src/server && npm start",
     "client": "cd src/client && npm start",
-    "build": "cd src/client && npm run build",
-    "postinstall": "cd src/server && npm install && cd ../client && npm install"
+    "build": "cd src/client && npm run build"
   },
   "keywords": [
     "bookstore",
