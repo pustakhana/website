@@ -7,6 +7,11 @@ const parseCSVFiles = () => {
     const catalogPath = path.join(__dirname, '../data/catelog - Catalog File.csv');
     const listingPath = path.join(__dirname, '../data/Untitled spreadsheet - Listing file.csv');
     
+    console.log('CSV Path (catalog):', catalogPath);
+    console.log('CSV Path (listing):', listingPath);
+    console.log('Catalog exists:', fs.existsSync(catalogPath));
+    console.log('Listing exists:', fs.existsSync(listingPath));
+    
     // Check if files exist
     if (!fs.existsSync(catalogPath)) {
       return reject(new Error(`Catalog file not found at ${catalogPath}`));
@@ -17,6 +22,8 @@ const parseCSVFiles = () => {
 
     const catalogData = {};
     const listingData = {};
+    let catalogCount = 0;
+    let listingCount = 0;
 
     // Parse catalog file
     fs.createReadStream(catalogPath)
@@ -53,9 +60,11 @@ const parseCSVFiles = () => {
             description: row['Description'],
             aboutAuthor: row['About Author'],
           };
+          catalogCount++;
         }
       })
       .on('end', () => {
+        console.log(`Loaded ${catalogCount} books from catalog CSV`);
         // Parse listing file
         fs.createReadStream(listingPath)
           .pipe(csv())
@@ -66,9 +75,11 @@ const parseCSVFiles = () => {
                 sellingPrice: parseInt(row['Your Selling Price']) || 0,
                 stockCount: parseInt(row['System Stock count']) || 100,
               };
+              listingCount++;
             }
           })
           .on('end', () => {
+            console.log(`Loaded ${listingCount} books from listing CSV`);
             // Merge data
             const mergedBooks = [];
             Object.keys(catalogData).forEach((skuId) => {
@@ -85,9 +96,15 @@ const parseCSVFiles = () => {
             console.log(`✓ Parsed ${mergedBooks.length} books from CSV files`);
             resolve(mergedBooks);
           })
-          .on('error', reject);
+          .on('error', (err) => {
+            console.error('Error parsing listing CSV:', err);
+            reject(err);
+          });
       })
-      .on('error', reject);
+      .on('error', (err) => {
+        console.error('Error parsing catalog CSV:', err);
+        reject(err);
+      });
   });
 };
 

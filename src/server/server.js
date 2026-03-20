@@ -1,4 +1,4 @@
-require('dotenv').config({ path: '../../.env' });
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
@@ -23,8 +23,23 @@ const buildPath = path.join(__dirname, '../client/build');
 app.use(express.static(buildPath));
 
 // Health check endpoint
-app.get('/health', (req, res) => {
-  res.json({ status: 'OK', message: 'Server is running' });
+app.get('/health', async (req, res) => {
+  try {
+    const bookCount = await Book.countDocuments();
+    res.json({ 
+      status: 'OK', 
+      message: 'Server is running',
+      database: 'connected',
+      booksInDatabase: bookCount
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 'ERROR',
+      message: 'Server error',
+      database: 'disconnected',
+      error: error.message
+    });
+  }
 });
 
 // API Routes
@@ -41,15 +56,25 @@ app.get('*', (req, res) => {
 const initializeApp = async () => {
   try {
     // Connect to database
+    console.log('MongoDB URI:', process.env.MONGODB_URI ? 'Set' : 'Not set');
     await connectDB();
+    console.log('✓ Database connected successfully');
 
     // Load books from CSV
     const booksExist = await Book.countDocuments();
+    console.log(`Database contains ${booksExist} books`);
+    
     if (booksExist === 0) {
       console.log('Loading books from CSV files...');
-      const booksData = await parseCSVFiles();
-      await Book.insertMany(booksData);
-      console.log(`✓ Successfully loaded ${booksData.length} books into database`);
+      try {
+        const booksData = await parseCSVFiles();
+        console.log(`Inserting ${booksData.length} books into database...`);
+        const result = await Book.insertMany(booksData);
+        console.log(`✓ Successfully loaded ${result.length} books into database`);
+      } catch (csvError) {
+        console.error('Failed to load CSV files:', csvError.message);
+        console.warn('⚠ Continuing without CSV data - database is empty');
+      }
     } else {
       console.log(`✓ Database already contains ${booksExist} books`);
     }
@@ -58,9 +83,11 @@ const initializeApp = async () => {
     const PORT = process.env.PORT || 5001;
     app.listen(PORT, () => {
       console.log(`\n🚀 Server running on http://localhost:${PORT}`);
+      console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
     });
   } catch (error) {
     console.error('Failed to initialize app:', error.message);
+    console.error('Full error:', error);
     process.exit(1);
   }
 };

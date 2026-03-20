@@ -4,6 +4,28 @@ const auth = require('../middleware/auth');
 
 const router = express.Router();
 
+// Get available genres - MUST come before /:id route
+router.get('/filters/genres', async (req, res) => {
+  try {
+    const genres = await Book.distinct('genre');
+    res.json(genres.filter(Boolean));
+  } catch (error) {
+    console.error('Error fetching genres:', error);
+    res.status(500).json({ message: 'Error fetching genres', error: error.message });
+  }
+});
+
+// Get available languages - MUST come before /:id route
+router.get('/filters/languages', async (req, res) => {
+  try {
+    const languages = await Book.distinct('language');
+    res.json(languages.filter(Boolean));
+  } catch (error) {
+    console.error('Error fetching languages:', error);
+    res.status(500).json({ message: 'Error fetching languages', error: error.message });
+  }
+});
+
 // Get all books with pagination and filtering
 router.get('/', async (req, res) => {
   try {
@@ -11,21 +33,23 @@ router.get('/', async (req, res) => {
     const skip = (page - 1) * limit;
 
     let filter = {};
-    if (genre) filter.genre = genre;
-    if (language) filter.language = language;
-    if (search) {
+    if (genre && genre !== '') filter.genre = genre;
+    if (language && language !== '') filter.language = language;
+    if (search && search !== '') {
       filter.$or = [
         { title: { $regex: search, $options: 'i' } },
         { author: { $regex: search, $options: 'i' } },
       ];
     }
 
+    console.log('Fetching books with filter:', filter);
     const books = await Book.find(filter)
       .skip(skip)
       .limit(parseInt(limit));
 
     const total = await Book.countDocuments(filter);
 
+    console.log(`Found ${books.length} books out of ${total}`);
     res.json({
       books,
       total,
@@ -33,7 +57,8 @@ router.get('/', async (req, res) => {
       pages: Math.ceil(total / limit),
     });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error('Error fetching books:', error);
+    res.status(500).json({ message: 'Error fetching books', error: error.message });
   }
 });
 
@@ -46,27 +71,8 @@ router.get('/:id', async (req, res) => {
     }
     res.json(book);
   } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
-
-// Get available genres
-router.get('/filters/genres', async (req, res) => {
-  try {
-    const genres = await Book.distinct('genre');
-    res.json(genres.filter(Boolean));
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
-
-// Get available languages
-router.get('/filters/languages', async (req, res) => {
-  try {
-    const languages = await Book.distinct('language');
-    res.json(languages.filter(Boolean));
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error('Error fetching book:', error);
+    res.status(500).json({ message: 'Error fetching book', error: error.message });
   }
 });
 
